@@ -3,51 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <title>D.M. MALIWANAG BUILDERS AND ENTERPRISES - Equipment Payroll</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-    header { text-align: center; margin-bottom: 20px; }
-    header h1 { margin: 0; font-size: 28px; font-weight: bold; }
-    header h2 { margin: 0; font-size: 20px; font-weight: normal; color: #555; }
-
-    nav { text-align: center; margin-bottom: 20px; }
-    nav button {
-      margin: 0 5px;
-      padding: 8px 16px;
-      border: none;
-      background: #007bff;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
+    :root{
+      --bg:#f6f7fb; --ink:#0f172a; --muted:#6b7280; --line:#e5e7eb;
+      --primary:#2563eb; --primary-600:#1d4ed8; --danger:#ef4444; --danger-600:#dc2626;
+      --thead:#1f2937; --thead-text:#fff; --card:#fff; --radius:12px;
+      --shadow:0 6px 18px rgba(0,0,0,.06);
     }
-    nav button:hover { background: #0056b3; }
+    *{box-sizing:border-box}
+    body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:var(--ink)}
+    .page{max-width:1100px;margin:0 auto;padding:22px}
 
-    .section { display: none; }
-    .active { display: block; }
+    header{ text-align:center; margin-bottom:14px;}
+    header h1{margin:0;font-size:28px;font-weight:900}
+    header h2{margin:4px 0 0;font-size:18px;font-weight:700;color:#111}
 
-    .controls { margin: 15px 0; text-align: center; }
-    input, select, button { padding: 6px 10px; margin: 5px; font-size: 14px; }
-    button { background: #007bff; color: #fff; border: none; cursor: pointer; border-radius: 4px; }
-    button:hover { background: #0056b3; }
-    .delete-btn { background: red; color: #fff; padding: 5px 10px; border-radius: 4px; }
-
-    table { width: 100%; border-collapse: collapse; background: #fff; margin-top: 15px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #333; color: #fff; }
-
-    .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-    .card {
-      background: #fff; padding: 20px; border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center;
+    /* top controls */
+    .topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin:8px 0 10px}
+    .label{font-weight:800}
+    input[type="date"], select, input[type="text"], input[type="number"]{
+      border:1px solid var(--line);padding:8px 10px;border-radius:8px;background:#fff;outline:none;
+      transition:box-shadow .15s,border .15s
     }
-    .card h3 { margin: 0; font-size: 16px; color: #555; }
-    .card p { font-size: 22px; font-weight: bold; margin: 10px 0 0; }
+    input[type="date"]:focus, select:focus, input[type="text"]:focus, input[type="number"]:focus{
+      border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.15)
+    }
+
+    nav{display:flex;justify-content:center;gap:10px;margin:14px 0}
+    nav button, .btn{
+      border:none;background:var(--primary);color:#fff;padding:9px 16px;border-radius:999px;cursor:pointer;
+      font-weight:800;box-shadow:var(--shadow);transition:background .15s,transform .05s
+    }
+    nav button:hover, .btn:hover{background:var(--primary-600)}
+    nav button:active, .btn:active{transform:translateY(1px)}
+    .btn.danger{background:var(--danger)} .btn.danger:hover{background:var(--danger-600)}
+    .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+
+    .section{display:none}
+    .active{display:block}
+
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:16px}
+    .card h3{margin:0 0 8px}
+
+    .controls{text-align:center;margin:10px 0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+
+    table{width:100%;border-collapse:collapse;background:#fff;margin-top:10px}
+    th,td{border:1px solid #d9d9d9;padding:10px;text-align:center;font-size:14px}
+    thead th{position:sticky;top:0;z-index:1;background:var(--thead);color:var(--thead-text)}
+    tbody tr:nth-child(even){background:#fafafa}
+    tbody tr:hover{background:#f1f5ff}
+
+    .dashboard{display:grid;grid-template-columns:repeat(3, 1fr);gap:12px;margin-bottom:10px}
+    .kpi{background:#fff;padding:18px;border:1px solid var(--line);border-radius:12px;text-align:center;box-shadow:var(--shadow)}
+    .kpi h4{margin:0;color:#555;font-weight:700}
+    .kpi p{margin:8px 0 0;font-size:22px;font-weight:900}
+
+    .delete-btn{background:var(--danger);color:#fff;padding:6px 10px;border-radius:6px;border:none;cursor:pointer}
+    .delete-btn:hover{background:var(--danger-600)}
+
+    @media (max-width:900px){
+      .dashboard{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:600px){
+      .dashboard{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
+<div class="page">
   <header>
     <h1>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h1>
     <h2>Equipment Payroll System</h2>
   </header>
+
+  <!-- Payroll Period (saved + used in print) -->
+  <div class="topbar">
+    <span class="label">Payroll Period:</span>
+    <input type="date" id="periodFrom">
+    <span>to</span>
+    <input type="date" id="periodTo">
+    <button class="btn ghost" onclick="savePeriod()">Save Period</button>
+  </div>
 
   <nav>
     <button onclick="showSection('equipmentSection')">Equipment</button>
@@ -57,242 +94,341 @@
 
   <!-- Equipment Section -->
   <div id="equipmentSection" class="section active">
-    <h2 style="text-align:center;">Equipment Management</h2>
-    <div class="controls">
-      <input type="text" id="eqName" placeholder="Equipment Name">
-      <input type="text" id="eqType" placeholder="Type">
-      <input type="number" id="eqRate" placeholder="Rate/Day">
-      <input type="text" id="eqDriver" placeholder="Driver Name">
-      <input type="number" id="eqDriverDays" placeholder="Driver Days Worked">
-      <input type="text" id="eqHelper" placeholder="Helper Name">
-      <input type="number" id="eqHelperDays" placeholder="Helper Days Worked">
-      <select id="eqStatus">
-        <option value="Available">Available</option>
-        <option value="In Use">In Use</option>
-        <option value="Under Repair">Under Repair</option>
-      </select>
-      <button onclick="addEquipment()">Add Equipment</button>
-    </div>
+    <div class="card">
+      <h3 style="text-align:center;">Equipment Management</h3>
+      <div class="controls">
+        <input type="text" id="eqName" placeholder="Equipment Name">
+        <input type="text" id="eqType" placeholder="Type">
+        <input type="number" id="eqRate" placeholder="Rate/Day" step="0.01" min="0">
+        <input type="text" id="eqDriver" placeholder="Driver Name">
+        <input type="number" id="eqDriverDays" placeholder="Driver Days Worked" step="0.5" min="0">
+        <input type="text" id="eqHelper" placeholder="Helper Name">
+        <input type="number" id="eqHelperDays" placeholder="Helper Days Worked" step="0.5" min="0">
+        <select id="eqStatus">
+          <option value="Available">Available</option>
+          <option value="In Use">In Use</option>
+          <option value="Under Repair">Under Repair</option>
+        </select>
+        <button class="btn" onclick="addEquipment()">Add Equipment</button>
+      </div>
 
-    <table id="equipmentTable">
-      <thead>
-        <tr>
-          <th>Equipment</th>
-          <th>Type</th>
-          <th>Rate/Day</th>
-          <th>Driver</th>
-          <th>Driver Days</th>
-          <th>Helper</th>
-          <th>Helper Days</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+      <div class="table-wrap">
+        <table id="equipmentTable">
+          <thead>
+            <tr>
+              <th>Equipment</th>
+              <th>Type</th>
+              <th>Rate/Day</th>
+              <th>Driver</th>
+              <th>Driver Days</th>
+              <th>Helper</th>
+              <th>Helper Days</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- Payroll Section -->
   <div id="payrollSection" class="section">
-    <h2 style="text-align:center;">Equipment Payroll</h2>
-    <table id="payrollTable">
-      <thead>
-        <tr>
-          <th>Equipment</th>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Rate/Day</th>
-          <th>Days Worked</th>
-          <th>Total Pay</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <div style="text-align:center; margin-top:15px;">
-      <button onclick="printPayroll()">Print Payroll</button>
+    <div class="card">
+      <h3 style="text-align:center;">Equipment Payroll</h3>
+      <div class="table-wrap">
+        <table id="payrollTable">
+          <thead>
+            <tr>
+              <th>Equipment</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Rate/Day</th>
+              <th>Days Worked</th>
+              <th>Total Pay</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot>
+            <tr>
+              <th colspan="5" style="text-align:right">GRAND TOTAL</th>
+              <th id="grandTotal">₱0</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div style="text-align:center; margin-top:15px;">
+        <button class="btn" onclick="printPayroll()">Print Payroll</button>
+      </div>
     </div>
   </div>
 
   <!-- Dashboard Section -->
   <div id="dashboardSection" class="section">
-    <h2 style="text-align:center;">Equipment Dashboard</h2>
-    <div class="dashboard">
-      <div class="card"><h3>Total Equipments</h3><p id="totalEquipments">0</p></div>
-      <div class="card"><h3>Available</h3><p id="availableEquipments">0</p></div>
-      <div class="card"><h3>In Use</h3><p id="inUseEquipments">0</p></div>
-      <div class="card"><h3>Under Repair</h3><p id="repairEquipments">0</p></div>
-      <div class="card"><h3>Total Drivers</h3><p id="totalDrivers">0</p></div>
-      <div class="card"><h3>Total Helpers</h3><p id="totalHelpers">0</p></div>
-      <div class="card"><h3>Total Payroll</h3><p id="totalPayroll">₱0</p></div>
+    <div class="card">
+      <h3 style="text-align:center;">Equipment Dashboard</h3>
+      <div class="dashboard">
+        <div class="kpi"><h4>Total Equipments</h4><p id="totalEquipments">0</p></div>
+        <div class="kpi"><h4>Available</h4><p id="availableEquipments">0</p></div>
+        <div class="kpi"><h4>In Use</h4><p id="inUseEquipments">0</p></div>
+        <div class="kpi"><h4>Under Repair</h4><p id="repairEquipments">0</p></div>
+        <div class="kpi"><h4>Total Drivers</h4><p id="totalDrivers">0</p></div>
+        <div class="kpi"><h4>Total Helpers</h4><p id="totalHelpers">0</p></div>
+        <div class="kpi"><h4>Total Payroll</h4><p id="totalPayroll">₱0</p></div>
+      </div>
+
+      <h4 style="text-align:center;margin:10px 0 6px">Recent Equipment</h4>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Equipment</th>
+              <th>Type</th>
+              <th>Driver</th>
+              <th>Helper</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recentEquipments"></tbody>
+        </table>
+      </div>
     </div>
-
-    <h3 style="text-align:center;">Recent Equipment</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Equipment</th>
-          <th>Type</th>
-          <th>Driver</th>
-          <th>Helper</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="recentEquipments"></tbody>
-    </table>
   </div>
+</div>
 
-  <script>
-    let equipmentList = JSON.parse(localStorage.getItem("equipmentList")) || [];
+<script>
+  // -------- Helpers --------
+  const peso = (n)=> "₱" + Number(n||0).toLocaleString("en-PH",{maximumFractionDigits:2});
+  const toNum = (v)=> {
+    const n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+  };
 
-    function saveData() {
-      localStorage.setItem("equipmentList", JSON.stringify(equipmentList));
-    }
+  // -------- Persistent state --------
+  let equipmentList = JSON.parse(localStorage.getItem("equipmentList")) || [];
 
-    function renderAll() {
-      renderEquipment();
-      renderPayroll();
-      updateDashboard();
-    }
+  // save and load payroll period
+  function loadPeriod(){
+    const from = localStorage.getItem("periodFrom") || "";
+    const to   = localStorage.getItem("periodTo") || "";
+    document.getElementById("periodFrom").value = from;
+    document.getElementById("periodTo").value = to;
+  }
+  function savePeriod(){
+    localStorage.setItem("periodFrom", document.getElementById("periodFrom").value || "");
+    localStorage.setItem("periodTo", document.getElementById("periodTo").value || "");
+    alert("Payroll period saved.");
+  }
 
-    function renderEquipment() {
-      const tableBody = document.querySelector("#equipmentTable tbody");
-      tableBody.innerHTML = "";
-      equipmentList.forEach((item, index) => {
-        const row = tableBody.insertRow();
-        row.insertCell(0).innerText = item.name;
-        row.insertCell(1).innerText = item.type;
-        row.insertCell(2).innerText = item.rate;
-        row.insertCell(3).innerText = item.driver;
-        row.insertCell(4).innerText = item.driverDays;
-        row.insertCell(5).innerText = item.helper;
-        row.insertCell(6).innerText = item.helperDays;
-        row.insertCell(7).innerText = item.status;
-        const actionCell = row.insertCell(8);
-        const delBtn = document.createElement("button");
-        delBtn.innerText = "Delete";
-        delBtn.className = "delete-btn";
-        delBtn.onclick = function () {
-          equipmentList.splice(index, 1);
-          saveData();
-          renderAll();
-        };
-        actionCell.appendChild(delBtn);
-      });
-    }
+  function saveData() {
+    localStorage.setItem("equipmentList", JSON.stringify(equipmentList));
+  }
 
-    function renderPayroll() {
-      const payrollBody = document.querySelector("#payrollTable tbody");
-      payrollBody.innerHTML = "";
+  // -------- Rendering --------
+  function renderAll() {
+    renderEquipment();
+    renderPayroll();
+    updateDashboard();
+  }
 
-      equipmentList.forEach(item => {
-        if (item.driver) {
-          const dRow = payrollBody.insertRow();
-          dRow.insertCell(0).innerText = item.name;
-          dRow.insertCell(1).innerText = item.driver;
-          dRow.insertCell(2).innerText = "Driver";
-          dRow.insertCell(3).innerText = item.rate;
-          dRow.insertCell(4).innerText = item.driverDays;
-          dRow.insertCell(5).innerText = item.driverDays * item.rate;
-        }
-        if (item.helper) {
-          const hRow = payrollBody.insertRow();
-          hRow.insertCell(0).innerText = item.name;
-          hRow.insertCell(1).innerText = item.helper;
-          hRow.insertCell(2).innerText = "Helper";
-          hRow.insertCell(3).innerText = item.rate;
-          hRow.insertCell(4).innerText = item.helperDays;
-          hRow.insertCell(5).innerText = item.helperDays * item.rate;
-        }
-      });
-    }
+  function renderEquipment() {
+    const tableBody = document.querySelector("#equipmentTable tbody");
+    tableBody.innerHTML = "";
+    equipmentList.forEach((item, index) => {
+      const row = tableBody.insertRow();
+      row.insertCell(0).innerText = item.name;
+      row.insertCell(1).innerText = item.type;
+      row.insertCell(2).innerText = peso(item.rate);
+      row.insertCell(3).innerText = item.driver || "-";
+      row.insertCell(4).innerText = item.driverDays ?? 0;
+      row.insertCell(5).innerText = item.helper || "-";
+      row.insertCell(6).innerText = item.helperDays ?? 0;
+      row.insertCell(7).innerText = item.status;
 
-    function updateDashboard() {
-      let total = equipmentList.length;
-      let available = equipmentList.filter(e => e.status === "Available").length;
-      let inUse = equipmentList.filter(e => e.status === "In Use").length;
-      let repair = equipmentList.filter(e => e.status === "Under Repair").length;
-      let drivers = equipmentList.filter(e => e.driver).length;
-      let helpers = equipmentList.filter(e => e.helper).length;
-      let totalPayroll = 0;
-      equipmentList.forEach(e => {
-        if (e.driverDays) totalPayroll += e.driverDays * e.rate;
-        if (e.helperDays) totalPayroll += e.helperDays * e.rate;
-      });
+      const actionCell = row.insertCell(8);
+      const delBtn = document.createElement("button");
+      delBtn.innerText = "Delete";
+      delBtn.className = "delete-btn";
+      delBtn.onclick = function () {
+        if(!confirm("Delete this equipment?")) return;
+        equipmentList.splice(index, 1);
+        saveData();
+        renderAll();
+      };
+      actionCell.appendChild(delBtn);
+    });
+  }
 
-      document.getElementById("totalEquipments").innerText = total;
-      document.getElementById("availableEquipments").innerText = available;
-      document.getElementById("inUseEquipments").innerText = inUse;
-      document.getElementById("repairEquipments").innerText = repair;
-      document.getElementById("totalDrivers").innerText = drivers;
-      document.getElementById("totalHelpers").innerText = helpers;
-      document.getElementById("totalPayroll").innerText = "₱" + totalPayroll.toLocaleString();
+  function renderPayroll() {
+    const payrollBody = document.querySelector("#payrollTable tbody");
+    payrollBody.innerHTML = "";
+    let grand = 0;
 
-      const recentTable = document.getElementById("recentEquipments");
-      recentTable.innerHTML = "";
-      equipmentList.slice(-5).forEach(e => {
-        let row = recentTable.insertRow();
-        row.insertCell(0).innerText = e.name;
-        row.insertCell(1).innerText = e.type;
-        row.insertCell(2).innerText = e.driver || "-";
-        row.insertCell(3).innerText = e.helper || "-";
-        row.insertCell(4).innerText = e.status;
-      });
-    }
+    equipmentList.forEach(item => {
+      const rate = toNum(item.rate);
+      const dDays = toNum(item.driverDays);
+      const hDays = toNum(item.helperDays);
 
-    function addEquipment() {
-      const name = document.getElementById("eqName").value.trim();
-      const type = document.getElementById("eqType").value.trim();
-      const rate = parseFloat(document.getElementById("eqRate").value.trim());
-      const driver = document.getElementById("eqDriver").value.trim();
-      const driverDays = parseInt(document.getElementById("eqDriverDays").value.trim()) || 0;
-      const helper = document.getElementById("eqHelper").value.trim();
-      const helperDays = parseInt(document.getElementById("eqHelperDays").value.trim()) || 0;
-      const status = document.getElementById("eqStatus").value;
-
-      if (!name || !type || !rate) {
-        alert("Please fill out required fields.");
-        return;
+      if (item.driver && dDays > 0) {
+        const total = dDays * rate;
+        grand += total;
+        const dRow = payrollBody.insertRow();
+        dRow.insertCell(0).innerText = item.name;
+        dRow.insertCell(1).innerText = item.driver;
+        dRow.insertCell(2).innerText = "Driver";
+        dRow.insertCell(3).innerText = peso(rate);
+        dRow.insertCell(4).innerText = dDays;
+        dRow.insertCell(5).innerText = peso(total);
       }
+      if (item.helper && hDays > 0) {
+        const total = hDays * rate;
+        grand += total;
+        const hRow = payrollBody.insertRow();
+        hRow.insertCell(0).innerText = item.name;
+        hRow.insertCell(1).innerText = item.helper;
+        hRow.insertCell(2).innerText = "Helper";
+        hRow.insertCell(3).innerText = peso(rate);
+        hRow.insertCell(4).innerText = hDays;
+        hRow.insertCell(5).innerText = peso(total);
+      }
+    });
 
-      equipmentList.push({ name, type, rate, driver, driverDays, helper, helperDays, status });
-      saveData();
-      renderAll();
+    document.getElementById("grandTotal").innerText = peso(grand);
 
-      document.querySelectorAll(".controls input").forEach(el => el.value = "");
+    // if empty, show friendly row
+    if (!payrollBody.children.length) {
+      const r = payrollBody.insertRow();
+      const c = r.insertCell(0);
+      c.colSpan = 6;
+      c.innerText = "No payroll data yet. Add equipment in the Equipment tab.";
+    }
+  }
+
+  function updateDashboard() {
+    const total = equipmentList.length;
+    const available = equipmentList.filter(e => e.status === "Available").length;
+    const inUse = equipmentList.filter(e => e.status === "In Use").length;
+    const repair = equipmentList.filter(e => e.status === "Under Repair").length;
+    const drivers = equipmentList.filter(e => !!e.driver).length;
+    const helpers = equipmentList.filter(e => !!e.helper).length;
+
+    let totalPayroll = 0;
+    equipmentList.forEach(e => {
+      const rate = toNum(e.rate);
+      const d = toNum(e.driverDays);
+      const h = toNum(e.helperDays);
+      totalPayroll += (d * rate) + (h * rate);
+    });
+
+    document.getElementById("totalEquipments").innerText = total;
+    document.getElementById("availableEquipments").innerText = available;
+    document.getElementById("inUseEquipments").innerText = inUse;
+    document.getElementById("repairEquipments").innerText = repair;
+    document.getElementById("totalDrivers").innerText = drivers;
+    document.getElementById("totalHelpers").innerText = helpers;
+    document.getElementById("totalPayroll").innerText = peso(totalPayroll);
+
+    // Recent list: last 5 added (most recent last)
+    const recentTable = document.getElementById("recentEquipments");
+    recentTable.innerHTML = "";
+    equipmentList.slice(-5).forEach(e => {
+      let row = recentTable.insertRow();
+      row.insertCell(0).innerText = e.name;
+      row.insertCell(1).innerText = e.type;
+      row.insertCell(2).innerText = e.driver || "-";
+      row.insertCell(3).innerText = e.helper || "-";
+      row.insertCell(4).innerText = e.status;
+    });
+  }
+
+  // -------- Actions --------
+  function addEquipment() {
+    const name = document.getElementById("eqName").value.trim().toUpperCase();
+    const type = document.getElementById("eqType").value.trim().toUpperCase();
+    const rate = toNum(document.getElementById("eqRate").value);
+    const driver = document.getElementById("eqDriver").value.trim().toUpperCase();
+    const driverDays = toNum(document.getElementById("eqDriverDays").value);
+    const helper = document.getElementById("eqHelper").value.trim().toUpperCase();
+    const helperDays = toNum(document.getElementById("eqHelperDays").value);
+    const status = document.getElementById("eqStatus").value;
+
+    if (!name || !type || rate <= 0) {
+      alert("Please enter Equipment Name, Type, and a valid Rate/Day.");
+      return;
+    }
+    // Optional: prevent duplicate names
+    if (equipmentList.some(e => e.name === name)) {
+      if (!confirm("Equipment with the same name exists. Add anyway?")) return;
     }
 
-    function printPayroll() {
-      const printContents = document.querySelector("#payrollTable").outerHTML;
-      const w = window.open("", "", "width=900,height=650");
-      w.document.write(`
-        <html>
-          <head><title>Equipment Payroll</title></head>
-          <body>
-            <h2 style="text-align:center;">D.M. MALIWANAG BUILDERS AND ENTERPRISES</h2>
-            <h3 style="text-align:center;">Equipment Payroll</h3>
-            <p style="text-align:center;"><b>Payroll Period:</b> _____________________</p>
-            ${printContents}
-            <br><br>
-            <table style="width:100%; margin-top:40px; text-align:center;">
-              <tr>
-                <td><b>Prepared by:</b><br><br>___________________</td>
-                <td><b>Checked by:</b><br><br>___________________</td>
-                <td><b>Approved by:</b><br><br>___________________</td>
-              </tr>
-            </table>
-          </body>
-        </html>
-      `);
-      w.document.close();
-      w.print();
-    }
+    equipmentList.push({ name, type, rate, driver, driverDays, helper, helperDays, status });
+    saveData();
+    renderAll();
 
-    function showSection(id) {
-      document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
-    }
+    // clear inputs
+    document.getElementById("eqName").value = "";
+    document.getElementById("eqType").value = "";
+    document.getElementById("eqRate").value = "";
+    document.getElementById("eqDriver").value = "";
+    document.getElementById("eqDriverDays").value = "";
+    document.getElementById("eqHelper").value = "";
+    document.getElementById("eqHelperDays").value = "";
+    document.getElementById("eqStatus").value = "Available";
+  }
 
-    window.onload = renderAll;
-  </script>
+  function printPayroll() {
+    const tableHTML = document.querySelector("#payrollTable").outerHTML;
+    const from = document.getElementById("periodFrom").value || "________";
+    const to   = document.getElementById("periodTo").value   || "________";
+
+    const w = window.open("", "", "width=900,height=650");
+    w.document.write(`
+      <html>
+        <head>
+          <title>Equipment Payroll</title>
+          <style>
+            body{font-family:Arial,Helvetica,sans-serif;margin:20px}
+            h2,h3{margin:6px 0;text-align:center}
+            table{width:100%;border-collapse:collapse;margin-top:10px}
+            th,td{border:1px solid #000;padding:6px;text-align:center}
+            thead th{background:#000;color:#fff}
+          </style>
+        </head>
+        <body>
+          <h2>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h2>
+          <h3>Equipment Payroll</h3>
+          <p style="text-align:center;"><b>Payroll Period:</b> ${from} to ${to}</p>
+          ${tableHTML}
+          <br><br>
+          <table style="width:100%; margin-top:32px; text-align:center;">
+            <tr>
+              <td><b>Prepared by:</b><br><br>___________________</td>
+              <td><b>Checked by:</b><br><br>___________________</td>
+              <td><b>Approved by:</b><br><br>___________________</td>
+            </tr>
+          </table>
+        </body>
+      </html>
+    `);
+    w.document.close();
+    w.focus();
+    w.print();
+  }
+
+  function showSection(id) {
+    document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    // refresh views when switching
+    if (id === 'payrollSection') renderPayroll();
+    if (id === 'dashboardSection') updateDashboard();
+  }
+
+  // -------- Init --------
+  window.onload = () => {
+    loadPeriod();
+    renderAll();
+  };
+</script>
 </body>
 </html>

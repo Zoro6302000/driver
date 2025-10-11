@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>D.M. MALIWANAG BUILDERS AND ENTERPRISES - Equipment Payroll System</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    h1 { margin:0; font-size:32px; font-weight:bold; text-align:left; }
+    h2 { margin:0; font-size:24px; font-weight:normal; text-align:center; }
+    .date { text-align: center; margin: 20px 0; font-weight: bold; }
+    nav { text-align: center; margin-bottom: 20px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+      font-size:14px;
+      table-layout: auto;
+    }
+    th, td {
+      padding: 6px;
+      border: 1px solid #ccc;
+      text-align: center;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    th { background: #333; color: #fff; }
+    button {
+      padding: 6px 12px;
+      background: linear-gradient(90deg, #004aad, #0073e6);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 2px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    input[type=text] { text-transform: uppercase; }
+    .trip-row td { background: #f9f9f9; font-size: 13px; }
+    .summary-row td { font-weight: bold; background: #eaeaea; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:center;gap:15px;">
+    <img src="DM LOGO.png" alt="Company Logo" style="height:120px;">
+    <div><h1>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h1></div>
+  </div>
+
+  <div style="text-align:center;margin-top:5px;">
+    <h2 style="margin:5px 0;font-size:28px;">Equipment Payroll System</h2>
+    <div style="font-size:12px;">by: Wenjunzxc</div>
+  </div>
+
+  <!-- Payroll Period -->
+  <div class="date">
+    Payroll Period:
+    <input type="date" id="payrollFrom"> to
+    <input type="date" id="payrollTo">
+  </div>
+
+  <!-- Navigation -->
+  <nav>
+    <button onclick="showInterface('dashboard')">Dashboard</button>
+    <button onclick="showInterface('equipment')">Per Equipment Payroll</button>
+    <button onclick="addNewEquipment()">Add New Equipment</button>
+  </nav>
+
+  <!-- Dashboard -->
+  <div id="dashboardInterface">
+    <h2 style="text-align:center;">Payroll Dashboard</h2>
+    <div id="summary">
+      <h3>Summary by Equipment</h3>
+      <table id="equipmentSummary">
+        <thead>
+          <tr>
+            <th>Equipment</th>
+            <th>Total Gross</th>
+            <th>Total Deductions</th>
+            <th>Total Net</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <th>GRAND TOTAL</th>
+            <th id="grandGross">₱0</th>
+            <th id="grandDeductions">₱0</th>
+            <th id="grandNet">₱0</th>
+          </tr>
+        </tfoot>
+      </table>
+      <br>
+      <button onclick="printSummary()">Print Summary</button>
+    </div>
+  </div>
+
+  <!-- Per Equipment Payroll -->
+  <div id="equipmentInterface" class="hidden">
+    <h2 style="text-align:center;">Per Equipment Payroll</h2>
+    <label for="perEquipmentSelect"><strong>Select Equipment:</strong></label>
+    <select id="perEquipmentSelect" onchange="renderEquipmentTable()"></select>
+    <button onclick="addRole('DRIVER')">Add Driver</button>
+    <button onclick="addRole('HELPER')">Add Helper</button>
+    <button onclick="deleteEquipment()">Delete Equipment</button>
+    <button onclick="printEquipmentPayroll()">Print</button>
+
+    <div id="equipmentPayrollArea">
+      <table id="perEquipmentTable">
+        <thead>
+          <tr>
+            <th>ROLE</th>
+            <th>NAME</th>
+            <th>TRIP TYPE</th>
+            <th>RATE PER DAY</th>
+            <th>DAYS WORKED</th>
+            <th>OT HOURS</th>
+            <th>GROSS PAY</th>
+            <th>CASH ADVANCE</th>
+            <th>SSS</th>
+            <th>PHILHEALTH</th>
+            <th>PAG-IBIG</th>
+            <th>TOTAL PAY</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr class="summary-row">
+            <td colspan="11" style="text-align:right;">GRAND TOTAL</td>
+            <td id="equipmentGrandTotal"></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+<script>
+let equipmentList = JSON.parse(localStorage.getItem("equipmentList")||"[]");
+let payrollData   = JSON.parse(localStorage.getItem("payrollData")||"{}");
+
+function saveData(){
+  localStorage.setItem("equipmentList", JSON.stringify(equipmentList));
+  localStorage.setItem("payrollData",   JSON.stringify(payrollData));
+}
+
+function showInterface(mode){
+  document.getElementById("dashboardInterface").classList.add("hidden");
+  document.getElementById("equipmentInterface").classList.add("hidden");
+  if(mode==="dashboard"){ 
+    document.getElementById("dashboardInterface").classList.remove("hidden");
+    updateSummary();
+  }else{
+    document.getElementById("equipmentInterface").classList.remove("hidden");
+    renderEquipmentTable();
+  }
+}
+
+function loadData(){
+  const select=document.getElementById("perEquipmentSelect");
+  select.innerHTML="";
+  equipmentList.forEach(eq=>{
+    const opt=document.createElement("option");
+    opt.value=eq; opt.textContent=eq;
+    select.appendChild(opt);
+  });
+  if(equipmentList.length){ select.value=equipmentList[0]; }
+  renderEquipmentTable(); updateSummary();
+}
+
+function addNewEquipment(){
+  let name=prompt("Enter new equipment name:"); if(!name) return;
+  name=name.toUpperCase();
+  if(!equipmentList.includes(name)){
+    equipmentList.push(name);
+    payrollData[name]={};
+    saveData(); loadData();
+  }else alert("Equipment already exists.");
+}
+
+function deleteEquipment(){
+  const select=document.getElementById("perEquipmentSelect");
+  const eq=select.value;
+  if(eq && confirm("Delete equipment: "+eq+"?")){
+    equipmentList = equipmentList.filter(e=>e!==eq);
+    delete payrollData[eq];
+    saveData(); loadData();
+  }
+}
+
+function addRole(role){
+  const eq=document.getElementById("perEquipmentSelect").value;
+  if(!eq){ alert("Add/select equipment first."); return; }
+  if(payrollData[eq][role]){ alert(role+" already exists for this equipment."); return; }
+  payrollData[eq][role] = {
+    name:"", trips:[],
+    rate:0, days:0, ot:0,
+    advance:0, sss:0, phil:0, pagibig:0
+  };
+  saveData(); renderEquipmentTable();
+}
+
+function addTrip(eq,role){
+  let name=prompt("Enter Trip Type:"); if(!name) return;
+  name=name.toUpperCase();
+  payrollData[eq][role].trips.push({
+    name, rate:0, days:0, ot:0,
+    advance:0, sss:0, phil:0, pagibig:0
+  });
+  saveData(); renderEquipmentTable();
+}
+function removeTrip(eq,role,idx){
+  payrollData[eq][role].trips.splice(idx,1);
+  saveData(); renderEquipmentTable();
+}
+function updateTripField(eq,role,idx,field,value){
+  if(field==="name") value=value.toUpperCase();
+  const num=parseFloat(value);
+  payrollData[eq][role].trips[idx][field] = (field==="name"?value:(isNaN(num)?0:num));
+  saveData();
+}
+
+function fmtPeso(n){ const v=Number(n)||0; return v===0 ? "" : "₱"+Math.round(v).toLocaleString("en-PH"); }
+function updateField(eq,role,field,value){
+  if(field==="name") value=(value||"").toUpperCase();
+  const num=parseFloat(value);
+  payrollData[eq][role][field] = (field==="name"?value:(isNaN(num)?0:num));
+  saveData();
+}
+
+function computeRow(emp){
+  let gross=(emp.rate*emp.days)+((emp.rate/8)*emp.ot);
+  let benefits=(Number(emp.sss)||0)+(Number(emp.phil)||0)+(Number(emp.pagibig)||0);
+  let deductions=(Number(emp.advance)||0)+benefits;
+  let net=gross-deductions;
+  emp.trips.forEach(trip=>{
+    const tgross=(trip.rate*trip.days)+((trip.rate/8)*trip.ot);
+    const tbenefits=(Number(trip.sss)||0)+(Number(trip.phil)||0)+(Number(trip.pagibig)||0);
+    const tded=(Number(trip.advance)||0)+tbenefits;
+    const tnet=tgross-tded;
+    gross+=tgross; benefits+=tbenefits; deductions+=tded; net+=tnet;
+  });
+  return {gross,benefits,net};
+}
+
+function renderEquipmentTable(){
+  const eq=document.getElementById("perEquipmentSelect").value;
+  const tbody=document.querySelector("#perEquipmentTable tbody");
+  tbody.innerHTML="";
+  if(!eq||!payrollData[eq]) return;
+  let roleTotals={};
+  ["DRIVER","HELPER"].forEach(role=>{
+    if(!payrollData[eq][role]) return;
+    const emp=payrollData[eq][role];
+    const mg=(emp.rate*emp.days)+((emp.rate/8)*emp.ot);
+    const md=(+emp.advance)+(+emp.sss)+(+emp.phil)+(+emp.pagibig);
+    const mn=mg-md;
+    let tr=document.createElement("tr");
+    tr.innerHTML=`<td>${role}</td>
+      <td><input value="${emp.name||""}" onblur="updateField('${eq}','${role}','name',this.value)"></td>
+      <td></td>
+      <td><input type="number" value="${emp.rate||""}" onblur="updateField('${eq}','${role}','rate',this.value)"></td>
+      <td><input type="number" value="${emp.days||""}" onblur="updateField('${eq}','${role}','days',this.value)"></td>
+      <td><input type="number" value="${emp.ot||""}" onblur="updateField('${eq}','${role}','ot',this.value)"></td>
+      <td>${fmtPeso(mg)}</td>
+      <td><input type="number" value="${emp.advance||""}" onblur="updateField('${eq}','${role}','advance',this.value)"></td>
+      <td><input type="number" value="${emp.sss||""}" onblur="updateField('${eq}','${role}','sss',this.value)"></td>
+      <td><input type="number" value="${emp.phil||""}" onblur="updateField('${eq}','${role}','phil',this.value)"></td>
+      <td><input type="number" value="${emp.pagibig||""}" onblur="updateField('${eq}','${role}','pagibig',this.value)"></td>
+      <td>${fmtPeso(mn)}</td><td></td>`;
+    tbody.appendChild(tr);
+    emp.trips.forEach((trip,i)=>{
+      const tg=(trip.rate*trip.days)+((trip.rate/8)*trip.ot);
+      const td=(+trip.advance)+(+trip.sss)+(+trip.phil)+(+trip.pagibig);
+      const tn=tg-td;
+      let trow=document.createElement("tr");
+      trow.className="trip-row";
+      trow.innerHTML=`<td>${role}</td><td></td>
+        <td><input value="${trip.name}" onblur="updateTripField('${eq}','${role}',${i},'name',this.value)"></td>
+        <td><input type="number" value="${trip.rate||""}" onblur="updateTripField('${eq}','${role}',${i},'rate',this.value)"></td>
+        <td><input type="number" value="${trip.days||""}" onblur="updateTripField('${eq}','${role}',${i},'days',this.value)"></td>
+        <td><input type="number" value="${trip.ot||""}" onblur="updateTripField('${eq}','${role}',${i},'ot',this.value)"></td>
+        <td>${fmtPeso(tg)}</td>
+        <td><input type="number" value="${trip.advance||""}" onblur="updateTripField('${eq}','${role}',${i},'advance',this.value)"></td>
+        <td><input type="number" value="${trip.sss||""}" onblur="updateTripField('${eq}','${role}',${i},'sss',this.value)"></td>
+        <td><input type="number" value="${trip.phil||""}" onblur="updateTripField('${eq}','${role}',${i},'phil',this.value)"></td>
+        <td><input type="number" value="${trip.pagibig||""}" onblur="updateTripField('${eq}','${role}',${i},'pagibig',this.value)"></td>
+        <td>${fmtPeso(tn)}</td>
+        <td><button onclick="removeTrip('${eq}','${role}',${i})">Remove</button></td>`;
+      tbody.appendChild(trow);
+    });
+    let addRow=document.createElement("tr");
+    addRow.className="trip-row";
+    addRow.innerHTML=`<td>${role}</td><td colspan="11" style="text-align:left;">
+      <button onclick="addTrip('${eq}','${role}')">+ Add Trip Type</button></td><td></td>`;
+    tbody.appendChild(addRow);
+    const {net}=computeRow(emp);
+    let netRow=document.createElement("tr");
+    netRow.className="summary-row";
+    netRow.innerHTML=`<td colspan="11" style="text-align:right;">${role} NET PAY</td><td>${fmtPeso(net)}</td><td></td>`;
+    tbody.appendChild(netRow);
+    roleTotals[role]=net;
+  });
+  const grand=(roleTotals["DRIVER"]||0)+(roleTotals["HELPER"]||0);
+  document.getElementById("equipmentGrandTotal").textContent=fmtPeso(grand);
+  saveData();
+}
+
+function updateSummary(){
+  const tbody=document.querySelector("#equipmentSummary tbody");
+  tbody.innerHTML="";
+  let gGross=0,gDed=0,gNet=0;
+  equipmentList.forEach(eq=>{
+    let eqGross=0,eqDed=0,eqNet=0;
+    if(!payrollData[eq]) return;
+    ["DRIVER","HELPER"].forEach(role=>{
+      const emp=payrollData[eq][role];
+      if(!emp) return;
+      const {gross,benefits,net}=computeRow(emp);
+      eqGross+=gross; eqDed+=(+emp.advance)+benefits; eqNet+=net;
+    });
+    gGross+=eqGross; gDed+=eqDed; gNet+=eqNet;
+    tbody.innerHTML+=`<tr><td>${eq}</td><td>${fmtPeso(eqGross)}</td><td>${fmtPeso(eqDed)}</td><td>${fmtPeso(eqNet)}</td></tr>`;
+  });
+  document.getElementById("grandGross").textContent=fmtPeso(gGross);
+  document.getElementById("grandDeductions").textContent=fmtPeso(gDed);
+  document.getElementById("grandNet").textContent=fmtPeso(gNet);
+}
+
+/* ========= Printing ========= */
+function printSummary(){
+  updateSummary();
+  const from=document.getElementById("payrollFrom").value || "";
+  const to=document.getElementById("payrollTo").value || "";
+  const table=document.getElementById("equipmentSummary").cloneNode(true);
+  const win=window.open("","_blank");
+  win.document.write(`<html><head><title>Payroll Summary</title>
+  <style>@page{size:A4;margin:12mm;}body{font-family:Arial;font-size:12px;margin:0;}
+  h2,h3{text-align:center;margin:4px 0;}table{border-collapse:collapse;width:100%;}
+  th,td{border:1px solid #000;padding:4px;text-align:center;}th{background:#000;color:#fff;}</style>
+  </head><body>
+  <div style="text-align:center;">
+    <img src="DM LOGO.png" style="height:90px;"><br>
+    <h2>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h2>
+    <h3>Payroll Summary by Equipment</h3>
+    <div>Payroll Period: ${from} to ${to}</div>
+  </div>
+  ${table.outerHTML}
+  <div style="margin-top:40px;display:flex;justify-content:space-between;">
+    <div>Prepared by:<br><br>_________________<br>Signature</div>
+    <div>Approved by:<br><br><u>DANA MALIWANAG</u><br>Signature</div>
+  </div>
+  </body></html>`);
+  win.print(); win.close();
+}
+
+function printEquipmentPayroll(){
+  const eq=document.getElementById("perEquipmentSelect").value;
+  if(!eq){ alert("Select equipment first."); return; }
+  renderEquipmentTable();
+  const from=document.getElementById("payrollFrom").value || "";
+  const to=document.getElementById("payrollTo").value || "";
+  const table=document.getElementById("perEquipmentTable").cloneNode(true);
+  table.querySelectorAll("input,button").forEach(el=>{
+    el.parentNode.textContent=el.value||"";
+  });
+  table.querySelectorAll(".trip-row").forEach(tr=>{
+    if(tr.textContent.includes("Add Trip Type")) tr.remove();
+  });
+  const win=window.open("","_blank");
+  win.document.write(`<html><head><title>${eq} Payroll</title>
+  <style>@page{size:A4;margin:12mm;}body{font-family:Arial;font-size:12px;margin:0;}
+  h2,h3{text-align:center;margin:4px 0;}table{border-collapse:collapse;width:100%;}
+  th,td{border:1px solid #000;padding:4px;text-align:center;}th{background:#000;color:#fff;}
+  .summary-row td{font-weight:bold;background:#f0f0f0;}</style>
+  </head><body>
+  <div style="text-align:center;">
+    <img src="DM LOGO.png" style="height:90px;"><br>
+    <h2>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h2>
+    <h3>Payroll Report - ${eq}</h3>
+    <div>Payroll Period: ${from} to ${to}</div>
+  </div>
+  ${table.outerHTML}
+  <div style="margin-top:40px;display:flex;justify-content:space-between;">
+    <div>Prepared by:<br><br>_________________<br>Signature</div>
+    <div>Approved by:<br><br><u>DANA MALIWANAG</u><br>Signature</div>
+  </div>
+  </body></html>`);
+  win.print(); win.close();
+}
+
+document.addEventListener("DOMContentLoaded", loadData);
+window.addEventListener("beforeunload", saveData);
+</script>
+</body>
+</html>
